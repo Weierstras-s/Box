@@ -10,8 +10,8 @@ public class MCamera : MonoBehaviour {
         GL.LoadOrtho();
         GL.Begin(GL.LINES);
         GL.Color(Color.red);
-        Vector2 v1 = Camera.main.WorldToScreenPoint(p1.PointToVec() + new Vector3(0, 0.5f));
-        Vector2 v2 = Camera.main.WorldToScreenPoint(p2.PointToVec() + new Vector3(0, 0.5f));
+        Vector2 v1 = Camera.main.WorldToScreenPoint(p1.Vec + new Vector3(0, 0.5f));
+        Vector2 v2 = Camera.main.WorldToScreenPoint(p2.Vec + new Vector3(0, 0.5f));
         GL.Vertex3(v1.x / Screen.width, v1.y / Screen.height, 0);
         GL.Vertex3(v2.x / Screen.width, v2.y / Screen.height, 0);
         GL.End();
@@ -66,6 +66,7 @@ public class MCamera : MonoBehaviour {
         curpos += (position - curpos) / 5;
         transform.position = curpos + new Vector3(-dis * Sin(rot.y), dis / Mathf.Sqrt(2), -dis * Cos(rot.y));
 
+        if (Player.isMoving) return;
         if (Input.GetKey(key: KeyCode.LeftShift) || Input.GetKey(key: KeyCode.RightShift)) {
             int key = Getkey();
             if (key == 0) {

@@ -54,9 +54,11 @@ public class Point {
         y = int.Parse(vs[1]);
         z = int.Parse(vs[2]);
     }
-
     public static Point operator +(Point a, Point b) {
         return new Point(a.x + b.x, a.y + b.y, a.z + b.z);
+    }
+    public static Point operator -(Point a, Point b) {
+        return new Point(a.x - b.x, a.y - b.y, a.z - b.z);
     }
     public static bool operator <(Point a, Point b) {
         if (a.x < b.x) return true;
@@ -70,7 +72,7 @@ public class Point {
         return a.x == b.x && a.y == b.y && a.z == b.z;
     }
     public static bool operator !=(Point a, Point b) {
-        return !(a==b);
+        return !(a == b);
     }
     public override bool Equals(object obj) {
         return this == (Point)obj;
@@ -83,20 +85,21 @@ public class Point {
     }
 
     //取该点上方或下方的点
-    public Point Up() {
-        return this + new Point(0, 1, 0);
+    public Point Up {
+        get { return this + new Point(0, 1, 0); }
     }
-    public Point Down() {
-        return this + new Point(0, -1, 0);
+    public Point Down {
+        get { return this + new Point(0, -1, 0); }
     }
 
     //点与向量转换
-    public Point VecToPoint(Vector3 vec) {
-        x = Mathf.RoundToInt(vec.x); y = Mathf.RoundToInt(vec.y); z = Mathf.RoundToInt(vec.z);
+    static public Point VecToPoint(Vector3 vec) {
+        int x = Mathf.RoundToInt(vec.x), y = Mathf.RoundToInt(vec.y), z = Mathf.RoundToInt(vec.z);
         return new Point(x, y, z);
     }
-    public Vector3 PointToVec() {
-        return new Vector3(x, y, z);
+    public Vector3 Vec {
+        get { return new Vector3(x, y, z); }
+        set { x = Mathf.RoundToInt(value.x); y = Mathf.RoundToInt(value.y); z = Mathf.RoundToInt(value.z); }
     }
     //点与字符串转换
     public void StrToPoint(string str) {
@@ -114,8 +117,8 @@ public class Point {
         return new Point(x, y, z);
     }
     //点的平面坐标
-    public Point2 Plain() {
-        return new Point2(x + y, z + y);
+    public Point2 Plain {
+        get { return new Point2(x + y, z + y); }
     }
 }
 class PointCompare : IComparer<Point> {
@@ -150,7 +153,7 @@ public class PointsS {
     public bool ContainsT(int x, int y, int z, int dir) {
         return Contains(new Point(x, y, z).Transfer((4 - dir) % 4));
     }
-    public bool ContainsT(Point p,int dir) {
+    public bool ContainsT(Point p, int dir) {
         return Contains(p.Transfer((4 - dir) % 4));
     }
     public void Clear() {
@@ -232,7 +235,7 @@ public class Map {
 
     //是否能走
     private bool Walkable(Point p) {
-        if (points.Contains(p.Up())) return boxes.Contains(p.Up());
+        if (points.Contains(p.Up)) return boxes.Contains(p.Up);
         return true;
     }
 
@@ -280,12 +283,12 @@ public class Map {
             bool b;
 
             //X+
-            nxtp = p.Transfer(direction).Plain() + new Point2(1, 0);
+            nxtp = p.Transfer(direction).Plain + new Point2(1, 0);
             maxy = -Cons.maxV;
             b = false;
             foreach (Point q in points.list) {
                 if (!Walkable(q)) continue;
-                if (q.y <= p.y && q.y > maxy && nxtp == q.Transfer(direction).Plain()) {
+                if (q.y <= p.y && q.y > maxy && nxtp == q.Transfer(direction).Plain) {
                     if (Blocked(p, q, 0)) continue;
                     point = q;
                     maxy = q.y;
@@ -295,12 +298,12 @@ public class Map {
             if (b) d.Add(0, point);
 
             //Z+
-            nxtp = p.Transfer(direction).Plain() + new Point2(0, 1);
+            nxtp = p.Transfer(direction).Plain + new Point2(0, 1);
             maxy = -Cons.maxV;
             b = false;
             foreach (Point q in points.list) {
                 if (!Walkable(q)) continue;
-                if (q.y <= p.y && q.y > maxy && nxtp == q.Transfer(direction).Plain()) {
+                if (q.y <= p.y && q.y > maxy && nxtp == q.Transfer(direction).Plain) {
                     if (Blocked(p, q, 1)) continue;
                     point = q;
                     maxy = q.y;
@@ -310,12 +313,12 @@ public class Map {
             if (b) d.Add(1, point);
 
             //X-
-            nxtp = p.Transfer(direction).Plain() + new Point2(-1, 0);
+            nxtp = p.Transfer(direction).Plain + new Point2(-1, 0);
             maxy = -Cons.maxV;
             b = false;
             foreach (Point q in points.list) {
                 if (!Walkable(q)) continue;
-                if (q.y >= p.y && q.y > maxy && nxtp == q.Transfer(direction).Plain()) {
+                if (q.y >= p.y && q.y > maxy && nxtp == q.Transfer(direction).Plain) {
                     if (Blocked(q, p, 0)) continue;
                     point = q;
                     maxy = q.y;
@@ -325,12 +328,12 @@ public class Map {
             if (b) d.Add(2, point);
 
             //Z-
-            nxtp = p.Transfer(direction).Plain() + new Point2(0, -1);
+            nxtp = p.Transfer(direction).Plain + new Point2(0, -1);
             maxy = -Cons.maxV;
             b = false;
             foreach (Point q in points.list) {
                 if (!Walkable(q)) continue;
-                if (q.y >= p.y && q.y > maxy && nxtp == q.Transfer(direction).Plain()) {
+                if (q.y >= p.y && q.y > maxy && nxtp == q.Transfer(direction).Plain) {
                     if (Blocked(q, p, 1)) continue;
                     point = q;
                     maxy = q.y;
@@ -344,9 +347,9 @@ public class Map {
     //下一步
     public bool NextPoint(int dir, Point cur, out Point point) {
         point = new Point();
-        if (!Launcher.map.edges.TryGetValue(cur.Down(), out Dictionary<int, Point> d)) return false;
+        if (!Launcher.map.edges.TryGetValue(cur.Down, out Dictionary<int, Point> d)) return false;
         if (!d.TryGetValue(dir, out point)) return false;
-        point = point.Up();
+        point = point.Up;
         return true;
     }
     //判断结束
@@ -384,7 +387,7 @@ public class Launcher : MonoBehaviour {
     public void AddBox(Point p) {
         AddBox(p.x, p.y, p.z);
     }
-    public void AddGoal(int x,int y,int z) {
+    public void AddGoal(int x, int y, int z) {
         GameObject g = Instantiate(goalPrefab, new Vector3(x, y - 0.5f, z), new Quaternion(0, 0, 0, 0));
         g.name = "Goal " + new Point(x, y, z).ToString();
         map.SetGoal(x, y, z);
@@ -411,7 +414,7 @@ public class Launcher : MonoBehaviour {
         GameObject camera = GameObject.Find("Main Camera");
         camera.GetComponent<MCamera>().currot = 45;
         camera.GetComponent<MCamera>().rotation = 45;
-        
+
         map.Init();
         string line;
         string path = System.Environment.CurrentDirectory + @"\Levels\";
@@ -453,7 +456,7 @@ public class Launcher : MonoBehaviour {
     }
 
     private void Update() {
-        if(Input.GetKeyDown(key: KeyCode.R)) {
+        if (Input.GetKeyDown(key: KeyCode.R)) {
             LoadLevel(curLevel);
         }
 
