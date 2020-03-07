@@ -55,7 +55,7 @@ public class MCamera : MonoBehaviour {
     private float Cos(float deg) {
         return Mathf.Cos(Mathf.Deg2Rad * deg);
     }
-    private void Update() {
+    private void LateUpdate() {
         Vector3 rot = transform.eulerAngles;
         currot += (rotation - currot) / 4;
         transform.eulerAngles = new Vector3(rot.x, currot, rot.z);

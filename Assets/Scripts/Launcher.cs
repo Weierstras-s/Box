@@ -240,7 +240,7 @@ public class Map {
     }
 
     //判断是否遮挡
-    public bool Blocked(Point ori, Point to, int dir) {
+    private bool Blocked(Point ori, Point to, int dir) {
         ori = ori.Transfer(direction);
         to = to.Transfer(direction);
         if (dir > 1) {
@@ -368,7 +368,7 @@ public class Launcher : MonoBehaviour {
     static public Map map = new Map();
 
     private readonly int maxLevel = 3;
-    private int curLevel = 1;
+    private int curLevel = 3;
 
     //编辑地图
     public void AddCube(int x, int y, int z) {
@@ -456,11 +456,11 @@ public class Launcher : MonoBehaviour {
     }
 
     private void Update() {
+        if (Player.isMoving) return;
+
         if (Input.GetKeyDown(key: KeyCode.R)) {
             LoadLevel(curLevel);
         }
-
-        if (Player.isMoving) return;
 
         if (map.IsWin()) {
             //获胜

@@ -136,20 +136,18 @@ public class Player : MonoBehaviour {
             if (!Launcher.map.GetBox(nextPoint)) {
                 //前方无箱子直接推
                 return true;
-            } else {
+            } else if (Launcher.map.NextPoint(key, nextPoint, out Point nextBoxPoint)) {
                 //前方有箱子
-                if (Launcher.map.NextPoint(key, nextPoint, out Point nextBoxPoint)) {
-                    int h = 0;
-                    for (; Launcher.map.GetBox(new Point(0, h, 0) + nextPoint); h++) {
-                        Point nbup = nextBoxPoint + new Point(0, h, 0);
-                        if (Launcher.map.GetPos(nbup)) {
-                            //箱子的前面有箱子
-                            return false;
-                        }
+                int h = 0;
+                for (; Launcher.map.GetBox(new Point(0, h, 0) + nextPoint); h++) {
+                    Point nbup = nextBoxPoint + new Point(0, h, 0);
+                    if (Launcher.map.GetPos(nbup)) {
+                        //箱子的前面有箱子
+                        return false;
                     }
-                    //可以推
-                    return true;
                 }
+                //可以推
+                return true;
             }
         }
         return false;
