@@ -118,52 +118,45 @@ namespace Stage.LevelData.Json {
     internal class JsonData {
         public Dictionary<string, JsonData> nodes = new();
         public Dictionary<string, List<object>> data = new();
-        private List<object> GetAll(JsonData root = null) {
+        private List<object> GetAll(bool recursive = false) {
             List<object> ret = new();
             void Search(JsonData data) {
-                foreach (var (_, node) in data.nodes) Search(node);
+                if (recursive) foreach (var (_, node) in data.nodes) Search(node);
                 foreach (var (_, obj) in data.data) ret.AddRange(obj);
             }
-            Search(root ?? this);
+            Search(this);
             return ret;
         }
         public void Clear() {
             nodes.Clear(); data.Clear();
         }
-        public List<object> Find(string path, bool create = false) {
-            if (path == "") return GetAll();
+        public JsonData Find(string path, bool create = false) {
             string[] ls = path.Split('.', StringSplitOptions.RemoveEmptyEntries);
             JsonData cur = this;
-            for (int i = 0; i < ls.Length - 1; ++i) {
-                string name = ls[i];
+            foreach (var name in ls) {
                 if (!cur.nodes.ContainsKey(name)) {
                     if (!create) return null;
                     cur.nodes[name] = new();
                 }
                 cur = cur.nodes[name];
             }
-            string back = ls[^1];
-            if (cur.nodes.ContainsKey(back)) return cur.nodes[back].GetAll();
-            if (!cur.data.ContainsKey(back)) {
-                if (!create) return null;
-                cur.data[back] = new();
-            }
-            return cur.data[back];
+            return cur;
         }
-        public List<object> FindByName(string name) {
-            List<object> ret = new();
-            void Search(JsonData data) {
-                foreach (var (cur, node) in data.nodes) {
-                    if (cur != name) Search(node);
-                    else ret.AddRange(GetAll(node));
-                }
-                foreach (var (cur, obj) in data.data) {
-                    if (cur != name) continue;
-                    ret.AddRange(obj);
-                }
+        public List<T> FindObjs<T>(string path, bool recursive = false)
+                where T : class {
+            JsonData cur = Find(path, false);
+            List<T> ret = new();
+            if (cur == null) return ret;
+            foreach (var obj in cur.GetAll(recursive)) {
+                if (obj is T) ret.Add(obj as T);
             }
-            Search(this);
             return ret;
+        }
+        public void AddObj<T>(string path, T obj) {
+            JsonData cur = Find(path, true);
+            string type = obj.GetType().Name;
+            if (!cur.data.ContainsKey(type)) cur.data[type] = new();
+            cur.data[type].Add(obj);
         }
         public void Transfer(string path = "") {
             foreach (var (name, node) in nodes) {
@@ -183,9 +176,6 @@ namespace Stage.LevelData.Json {
             var ret = Convert.Deserialize<JsonData>(json);
             ret.Transfer();
             return ret;
-        }
-        public List<object> this[string path] {
-            get { return Find(path, true); }
         }
     }
 }

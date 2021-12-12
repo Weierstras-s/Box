@@ -18,7 +18,7 @@ namespace Stage.GameStates {
                 if (!Input.GetMouseButtonDown(0)) return false;
                 enter = new AdjustCamera.Param {
                     mousePosition = Input.mousePosition,
-                    camRotation = cameraController.transform.rotation,
+                    camRotation = self.cameraController.transform.rotation,
                     beginView = self.map.view,
                 };
                 return true;
@@ -37,7 +37,7 @@ namespace Stage.GameStates {
 
         public override void Update() {
             // 鼠标滚轮调节摄像机距离
-            cameraController.UpdateDist(Input.mouseScrollDelta.y);
+            self.cameraController.UpdateDist(Input.mouseScrollDelta.y);
         }
         public override void Enter(object obj) {
 

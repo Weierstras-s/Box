@@ -15,7 +15,7 @@ namespace Stage.GameStates {
             public Views.BaseView beginView;
         }
 
-        private const float switchDistTolerance = 2f;
+        private const float switchDistTolerance = 5f;
         private const float switchTimeTolerance = 0.08f;
 
         private Param param;
@@ -24,28 +24,28 @@ namespace Stage.GameStates {
         private float movedDist;
         private float movedTime;
 
-        private bool isPersp = true;
-
         public AdjustCamera() {
             // 松开鼠标时返回闲置状态
             AddTransition<Idle>((ref object enter, ref object exit) => {
                 if (Input.GetMouseButton(0)) return false;
                 return true;
             });
-
         }
 
         public override void Update() {
             // 更新鼠标移动的距离与移动时间
-            movedDist += (Input.mousePosition - mousePos).magnitude;
+            var mousePosRaw = Input.mousePosition;
+            movedDist += (mousePosRaw - mousePos).magnitude;
             movedTime += Time.deltaTime;
+            mousePos = mousePosRaw;
 
             // 更新摄像机方向
-            mousePos = Input.mousePosition;
-            var mouse = mousePos - param.mousePosition;
+            float speed = Config.Input.Mouse.camRotateSpeed;
+            var mouse = (mousePos - param.mousePosition) * speed;
             float newX = Mathf.Clamp(beginRot.x - mouse.y, -90, 90);
+            param.mousePosition.y = mousePos.y - (beginRot.x - newX) / speed;
             float newY = beginRot.y + mouse.x;
-            cameraController.rotation = Quaternion.Euler(newX, newY, 0);
+            self.cameraController.rotation.Set(Quaternion.Euler(newX, newY, 0));
         }
         public override void Enter(object obj) {
             param = obj as Param;
@@ -58,19 +58,17 @@ namespace Stage.GameStates {
         public override void Exit(object obj) {
             // 改变模式 (3D/2D)
             // 条件: 鼠标移动距离或移动时间较小
+            bool isPersp = param.beginView is Views.Perspective;
             if (movedDist < switchDistTolerance ||
                 movedTime < switchTimeTolerance) {
                 isPersp = !isPersp;
             }
-            Debug.Log((movedDist, movedTime));
 
             // 计算目标视角
-            var target = cameraController.GetTargetView(isPersp);
+            var target = self.cameraController.GetTargetView(isPersp);
             self.map.view = target;
             // 摄像机吸附
-            if (self.map.view is Views.Orthogonal view) {
-                cameraController.rotation = view.direction;
-            }
+            self.cameraController.SetView(self.map.view);
         }
     }
 }

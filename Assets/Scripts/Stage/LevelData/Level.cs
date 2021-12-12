@@ -9,20 +9,6 @@ using static Stage.LevelData.Json.Convert;
 
 namespace Stage.LevelData {
     internal class PathManager {
-        public static string GetPathByType(Type type, int level) {
-            List<Type> ts = new() { type };
-            string path = "";
-            for (int i = 1; i < level; ++i) ts.Add(ts[^1].BaseType);
-            ts.Reverse();
-            foreach (var t in ts) path += t.Name + ".";
-            return path[0..^1];
-        }
-        public static string GetPath<T>(int level) {
-            return GetPathByType(typeof(T), level);
-        }
-        public static string GetPath(object obj, int level) {
-            return GetPathByType(obj.GetType(), level);
-        }
         public static object Transfer(string path, object obj) {
             string type = path.Split('.')[^1];
             string json = Serialize(obj);
@@ -49,15 +35,18 @@ namespace Stage.LevelData {
         private JsonData objs = new();
 
         /// <summary> 添加物品 </summary>
-        public void Add(object obj) {
-            var path = PathManager.GetPath(obj, 2);
-            objs[path].Add(obj);
+        public void Add(string path, object obj) {
+            objs.AddObj(path, obj);
         }
 
-        /// <summary> 查找某种类型的物品 </summary>
-        public List<T> Find<T>() where T : class {
-            var ls = objs.FindByName(typeof(T).Name);
-            return ls.ConvertAll<T>(new((object obj) => obj as T));
+        /// <summary> 查找指定路径下的所有物品 </summary>
+        public List<T> FindAll<T>(string path) where T : class {
+            return objs.FindObjs<T>(path, true);
+        }
+
+        /// <summary> 查找指定路径下的所有物品 (不包括子目录) </summary>
+        public List<T> Find<T>(string path) where T : class {
+            return objs.FindObjs<T>(path, false);
         }
 
         /// <summary> 序列化 </summary>

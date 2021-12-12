@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,5 +17,41 @@ namespace Utils {
             while (deg <= -180) deg += 360;
             return deg;
         }
+    }
+    public class Smoothing<T> {
+        public Action<T> SetCurrent = null;
+        public Func<T> GetCurrent = null;
+        public Action<T> SetDest = null;
+        public Func<T> GetDest = null;
+        public Func<T, T, T> Lerp = null;
+
+        private T m_current;
+        public T current {
+            get {
+                if (GetCurrent != null) return GetCurrent();
+                return m_current;
+            }
+            set {
+                if (SetCurrent != null) SetCurrent(value);
+                else m_current = value;
+            }
+        }
+
+        private T m_dest;
+        public T dest {
+            get {
+                if (GetDest != null) return GetDest();
+                return m_dest;
+            }
+            set {
+                if (SetDest != null) SetDest(value);
+                else m_dest = value;
+            }
+        }
+
+        public void Set(T dest) { this.dest = dest; }
+        public void Init() { current = dest; }
+        public void Init(T dest) { this.dest = current = dest; }
+        public void Update() { current = Lerp(current, dest); }
     }
 }

@@ -12,6 +12,7 @@ namespace Stage {
         public static FSM<LevelManager> fsm;
 
         public Map map;
+        public CameraController cameraController;
 
         public List<Orthogonal> views;
         public Player player;
@@ -25,9 +26,11 @@ namespace Stage {
         }
 
         public void LoadLevel(LevelData.Level data) {
-            map = new(data);
+            map = new(itemData: data.Find<Item>(""),
+                      goalData: data.Find<Goal>(""),
+                      initView: data.Find<BaseView>("Views.Default")[0]);
             player = map.players[0];
-            views = data.Find<Orthogonal>();
+            views = data.Find<Orthogonal>("");
 
             foreach (var (pos, item) in map.items) {
                 var obj = GetPrefab(item);
@@ -38,11 +41,14 @@ namespace Stage {
         private void Awake() {
             manager = this;
             fsm = new(this);
+            fsm.AddState<Init>();
             fsm.AddState<Idle>();
             fsm.AddState<AdjustCamera>();
             fsm.AddState<Move>();
             fsm.AddState<SwitchLevel>();
-            fsm.Translate<Idle>();
+            fsm.EnterState<Init>();
+
+            cameraController = Camera.main.GetComponent<CameraController>();
         }
         private void Update() {
             fsm.Update();
@@ -54,11 +60,5 @@ namespace Stage {
         public GameObject floorPrefab;
         public GameObject boxPrefab;
         public GameObject playerPrefab;
-
-        private void Start() {
-            string json = TestScript.Level1();
-
-            LoadLevel(LevelData.Level.FromJson(json));
-        }
     }
 }

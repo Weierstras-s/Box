@@ -6,7 +6,7 @@ using Stage.GameStates;
 using Stage.Objects;
 using Stage.Views;
 
-namespace Stage.Config {
+namespace Stage.Config.Input {
     public class Keyboard {
         public static KeyCode keyMoveR = KeyCode.RightArrow;
         public static KeyCode keyMoveU = KeyCode.UpArrow;
@@ -14,5 +14,9 @@ namespace Stage.Config {
         public static KeyCode keyMoveD = KeyCode.DownArrow;
         public static KeyCode keyRollback = KeyCode.Z;
         public static KeyCode keyRestart = KeyCode.R;
+    }
+    public class Mouse {
+        public static float camRotateSpeed = 0.8f;
+        public static float camScrollSpeed = 2f;
     }
 }

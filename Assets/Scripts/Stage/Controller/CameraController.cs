@@ -16,10 +16,9 @@ namespace Stage {
             private const float camFar = 1000f;
             private const float camField = 20f;
 
-            /// <summary> 透视率 </summary>
-            public float x = 1f;
-
-            public Matrix4x4 Get(Rect rect, float camDist) {
+            /// <summary> 计算投影矩阵 </summary>
+            /// <param name="x"> 透视率 </param>
+            public static Matrix4x4 Get(float x, Rect rect, float camDist) {
                 float n = camNear, f = camFar;
                 float alpha = Mathf.Deg2Rad * camField;
 
@@ -36,32 +35,64 @@ namespace Stage {
             }
         }
 
-        public static CameraController cameraController { get; private set; }
-
         private const float nearDist = 10f;
         private const float farDist = 30f;
         private const float defaultDist = 15f;
-        private const float scrollSpeed = 2f;
 
         /// <summary> 视角吸附允许误差范围 (角度) </summary>
         private const float magTolerance = 45f;
 
+
+        /// <summary> 到玩家的距离 </summary>
+        private Smoothing<float> dist;
+        /// <summary> 摄像机中心 </summary>
+        public Smoothing<Vector3> center;
         /// <summary> 摄像机角度 </summary>
-        public Quaternion rotation;
-
-        private float camDist = defaultDist;
-        private float curDist;
-
-        private Vector3 center { get => manager.player.transform.position; }
-        private Vector3 curCenter = new();
-
-        private readonly ProjectionMatrix projMatrix = new();
+        public Smoothing<Quaternion> rotation;
+        /// <summary> 透视率 </summary>
+        public Smoothing<float> persp;
 
 
         private void Awake() {
-            cameraController = this;
-            rotation = transform.rotation;
-            curDist = camDist;
+            dist = new() {
+                Lerp = (float x, float y) => Mathf.Lerp(x, y, Common.Lerp()),
+            };
+
+            center = new() {
+                Lerp = (Vector3 x, Vector3 y) => Vector3.Lerp(x, y, Common.Lerp()),
+                GetDest = () => {
+                    if (manager.player == null) return center.current;
+                    return manager.player.transform.position;
+                },
+            };
+
+            rotation = new() {
+                Lerp = (Quaternion x, Quaternion y) => Quaternion.Slerp(x, y, Common.Lerp()),
+                GetCurrent = () => transform.rotation,
+                SetCurrent = (Quaternion x) => transform.rotation = x,
+            };
+
+            persp = new() {
+                Lerp = (float x, float y) => Mathf.Lerp(x, y, Common.Lerp()),
+                GetDest = () => {
+                    if (manager.map is null) return persp.current;
+                    return manager.map.view is Views.Orthogonal ? 0f : 1f;
+                },
+            };
+        }
+        public void Init() {
+            dist.Init(defaultDist);
+            center.Init();
+            rotation.Init();
+            persp.Init();
+        }
+
+        public void SetView(Views.BaseView view, Quaternion? def = null) {
+            if (view is Views.Orthogonal ortho) {
+                rotation.Set(ortho.direction);
+            } else if (def.HasValue) {
+                rotation.Set(def.Value);
+            }
         }
 
         public Views.BaseView GetTargetView(bool isPersp = false) {
@@ -78,24 +109,24 @@ namespace Stage {
         }
 
         public void UpdateDist(float delta) {
-            delta *= -scrollSpeed;
-            camDist = Mathf.Clamp(camDist + delta, nearDist, farDist);
+            delta *= -Config.Input.Mouse.camScrollSpeed;
+            dist.dest = Mathf.Clamp(dist.dest + delta, nearDist, farDist);
         }
 
         private void Update() {
             // 改投影矩阵
-            float persp = manager.map.view is Views.Orthogonal ? 0f : 1f;
-            projMatrix.x = Mathf.Lerp(projMatrix.x, persp, Common.Lerp());
+            persp.Update();
             var camera = GetComponent<Camera>();
-            camera.projectionMatrix = projMatrix.Get(camera.pixelRect, curDist);
+            var mat = ProjectionMatrix.Get(persp.current, camera.pixelRect, dist.current);
+            camera.projectionMatrix = mat;
 
             // 改旋转角
-            transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Common.Lerp());
+            rotation.Update();
 
             // 改位置
-            curCenter = Vector3.Lerp(curCenter, center, Common.Lerp());
-            curDist = Mathf.Lerp(curDist, camDist, Common.Lerp());
-            transform.position = curCenter + transform.rotation * new Vector3(0, 0, -curDist);
+            center.Update();
+            dist.Update();
+            transform.position = center.current + transform.rotation * new Vector3(0, 0, -dist.current);
         }
     }
 }

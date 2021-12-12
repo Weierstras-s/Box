@@ -12,7 +12,7 @@ namespace Stage {
             LevelData.Level data = new();
 
             void Add(object item) {
-                data.Add(item);
+                data.Add("", item);
             }
 
             Add(new Player() { position = new(0,1,0) });
@@ -59,6 +59,8 @@ namespace Stage {
             Add(new Face(2));
             Add(new Face(3));
 
+            data.Add("Views.Default", new Vertex(0));
+
             string s = data.ToJson();
             Debug.Log(s);
             return s;
@@ -67,7 +69,7 @@ namespace Stage {
             LevelData.Level data = new();
 
             void Add(object item) {
-                data.Add(item);
+                data.Add("", item);
             }
             
             Add(new Player() { position = new(-1, 1, -1) });
@@ -114,6 +116,8 @@ namespace Stage {
             Add(new Face(1));
             Add(new Face(2));
             Add(new Face(3));
+
+            data.Add("Views.Default", new Face(0));
 
             string s = data.ToJson();
             Debug.Log(s);

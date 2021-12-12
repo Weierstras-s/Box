@@ -20,18 +20,18 @@ namespace Stage {
         private readonly Dictionary<Item, Item[]> edges = new();
         private readonly Stack<MoveData> moveHistory = new();
 
-        public Map(LevelData.Level data) {
-            foreach (var item in data.Find<Item>()) {
+        public Map(List<Item> itemData, List<Goal> goalData, Views.BaseView initView) {
+            foreach (var item in itemData) {
                 items[item.position] = item;
                 if (item is Player player) {
                     players.Add(player);
                 }
             }
-            foreach (var goal in data.Find<Goal>()) {
+            foreach (var goal in goalData) {
                 goals[goal.position] = goal;
             }
             players.Sort((Player L, Player R) => L.playerId.CompareTo(R.playerId));
-            view = new Views.Perspective();
+            view = initView;
         }
 
         /// <summary> 判断当前状态是否获胜 (每个目标上都有箱子/玩家) </summary>

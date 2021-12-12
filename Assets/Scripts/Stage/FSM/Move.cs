@@ -26,15 +26,7 @@ namespace Stage.GameStates {
                 nextDirection = Direction.Get();
             }
             if ((curTime += Time.deltaTime) > time) {
-                // 如果缓冲区内有按键或按着不放则继续移动
-                if (nextDirection == Direction.None) {
-                    nextDirection = Direction.Get(Input.GetKey);
-                }
-                if (nextDirection != Direction.None) {
-                    fsm.Translate<Move>(new Param() {
-                        direction = nextDirection,
-                    });
-                } else fsm.Translate<Idle>();
+                fsm.ExitState();
                 return;
             }
 
@@ -65,6 +57,16 @@ namespace Stage.GameStates {
             foreach (var (item, _) in oldPos) {
                 item.transform.position = item.position;
             }
+
+            // 如果缓冲区内有按键或按着不放则继续移动
+            if (nextDirection == Direction.None) {
+                nextDirection = Direction.Get(Input.GetKey);
+            }
+            if (nextDirection != Direction.None) {
+                fsm.EnterState<Move>(new Param() {
+                    direction = nextDirection,
+                });
+            } else fsm.EnterState<Idle>();
         }
     }
 }

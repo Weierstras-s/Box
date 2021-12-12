@@ -30,12 +30,11 @@ namespace Templates {
 			private readonly T self;
 			private readonly Dictionary<Type, FSMState<T>> stateDic;
 			public FSMState<T> currentState { get; private set; }
-			public FSMState<T> previousState { get; private set; }
 			public bool isRunning { get { return currentState != null; } }
 			public FSM(T self) {
 				this.self = self;
 				stateDic = new Dictionary<Type, FSMState<T>>();
-				previousState = currentState = null;
+				currentState = null;
 			}
 			public void AddState(params FSMState<T>[] states) {
 				foreach (var state in states) {
@@ -49,22 +48,46 @@ namespace Templates {
 				stateDic.Add(typeof(S), new S() { self = self, fsm = this });
 			}
 
-			public void Translate(Type state, object enter = null, object exit = null) {
+			private readonly Queue<Action> actions = new();
+			public void ExitState(object exit = null) {
+				actions.Enqueue(() => {
+					if (currentState == null) return;
+					var prevState = currentState;
+					currentState = null;
+					// Log($"Exit {prevState.GetType().Name}");
+					prevState.Exit(exit);
+				});
+			}
+			public void EnterState(Type state, object enter = null) {
 				Assert(stateDic.ContainsKey(state), $"State {state.Name} not exists.");
+				actions.Enqueue(() => {
+					if (currentState != null) return;
+					var nextState = stateDic[state];
+					// Log($"Enter {nextState.GetType().Name}");
+					nextState.Enter(enter);
+					currentState = nextState;
+				});
+			}
+			public void EnterState<S>(object enter = null) {
+				EnterState(typeof(S), enter);
+			}
+			public void Translate(Type state, object enter = null, object exit = null) {
 				ExitState(exit);
-				currentState = stateDic[state];
-				currentState.Enter(enter);
+				EnterState(state, enter);
 			}
 			public void Translate<S>(object enter = null, object exit = null) {
 				Translate(typeof(S), enter, exit);
 			}
-			public void ExitState(object exit = null) {
-				var backup = currentState;
-				currentState = null;
-				if (backup != null) backup.Exit(exit);
-				previousState = backup;
-			}
 			public void Update() {
+				int cnt = 0;
+				while (actions.Count > 0) {
+					if (++cnt > 20) {
+						Assert(false, "Fuck!");
+						break;
+					}
+					actions.Dequeue()();
+				}
+				actions.Clear();
 				if (currentState == null) return;
 				currentState.Update();
 				currentState.Translate();

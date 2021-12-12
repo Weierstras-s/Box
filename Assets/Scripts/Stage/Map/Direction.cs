@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Stage.Config.Keyboard;
+using static Stage.Config.Input.Keyboard;
 
 namespace Stage {
     class Direction {
