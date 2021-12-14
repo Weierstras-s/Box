@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utils;
 using static Stage.LevelManager;
+using static Stage.Config.Static.Camera.Projection;
+using static Stage.Config.Static.Camera.Controller;
 
 namespace Stage {
     /// <summary>
@@ -12,9 +14,6 @@ namespace Stage {
     /// </summary>
     public class CameraController : MonoBehaviour {
         public class ProjectionMatrix {
-            private const float camNear = 1f;
-            private const float camFar = 1000f;
-            private const float camField = 20f;
 
             /// <summary> 计算投影矩阵 </summary>
             /// <param name="x"> 透视率 </param>
@@ -34,14 +33,6 @@ namespace Stage {
                 return new(v0, v1, v2, v3);
             }
         }
-
-        private const float nearDist = 10f;
-        private const float farDist = 30f;
-        private const float defaultDist = 15f;
-
-        /// <summary> 视角吸附允许误差范围 (角度) </summary>
-        private const float magTolerance = 45f;
-
 
         /// <summary> 到玩家的距离 </summary>
         private Smoothing<float> dist;

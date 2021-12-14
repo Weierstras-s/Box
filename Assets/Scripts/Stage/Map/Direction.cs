@@ -5,7 +5,7 @@ using UnityEngine;
 using static Stage.Config.Input.Keyboard;
 
 namespace Stage {
-    class Direction {
+    public class Direction {
         public const int None = -1;
         public const int Right = 0;
         public const int Up = 1;
@@ -13,7 +13,7 @@ namespace Stage {
         public const int Down = 3;
         public const int Rollback = 4;
 
-        private static readonly List<(KeyCode, int)> directions = new() {
+        private static readonly List<(KeyCode, int)> keyMap = new() {
             (keyMoveR, Right),
             (keyMoveU, Up),
             (keyMoveL, Left),
@@ -23,7 +23,7 @@ namespace Stage {
         /// <summary> 获取键盘点击的方向, 如果没有按下方向键返回 -1 </summary>
         public static int Get(Func<KeyCode, bool> inputMethod) {
             int res = None, count = 0;
-            foreach (var (key, dir) in directions) {
+            foreach (var (key, dir) in keyMap) {
                 if (!inputMethod(key)) continue;
                 res = dir; ++count;
             }

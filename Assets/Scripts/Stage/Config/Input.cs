@@ -14,6 +14,7 @@ namespace Stage.Config.Input {
         public static KeyCode keyMoveD = KeyCode.DownArrow;
         public static KeyCode keyRollback = KeyCode.Z;
         public static KeyCode keyRestart = KeyCode.R;
+        public static KeyCode keySwitchPlayer = KeyCode.Space;
     }
     public class Mouse {
         public static float camRotateSpeed = 0.8f;

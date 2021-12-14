@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Templates.FSM;
-using static Stage.CameraController;
+using static Stage.Config.Input.Keyboard;
 
 namespace Stage.GameStates {
     public class Idle : FSMState<LevelManager> {
@@ -18,7 +18,7 @@ namespace Stage.GameStates {
                 if (!Input.GetMouseButtonDown(0)) return false;
                 enter = new AdjustCamera.Param {
                     mousePosition = Input.mousePosition,
-                    camRotation = self.cameraController.transform.rotation,
+                    camRotation = self.camera.transform.rotation,
                     beginView = self.map.view,
                 };
                 return true;
@@ -37,7 +37,12 @@ namespace Stage.GameStates {
 
         public override void Update() {
             // Êó±ê¹öÂÖµ÷½ÚÉãÏñ»ú¾àÀë
-            self.cameraController.UpdateDist(Input.mouseScrollDelta.y);
+            self.camera.UpdateDist(Input.mouseScrollDelta.y);
+
+            // Íæ¼ÒÇÐ»»
+            if (Input.GetKeyDown(keySwitchPlayer)) {
+                self.player = self.player.nextPlayer;
+            }
         }
         public override void Enter(object obj) {
 

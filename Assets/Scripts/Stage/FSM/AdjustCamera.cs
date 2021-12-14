@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Templates.FSM;
-using static Stage.CameraController;
+using static Stage.Config.Static.Camera.Controller;
 
 namespace Stage.GameStates {
     public class AdjustCamera : FSMState<LevelManager> {
@@ -14,9 +14,6 @@ namespace Stage.GameStates {
             /// <summary> 视角 </summary>
             public Views.BaseView beginView;
         }
-
-        private const float switchDistTolerance = 5f;
-        private const float switchTimeTolerance = 0.08f;
 
         private Param param;
         private Vector3 beginRot;
@@ -45,7 +42,7 @@ namespace Stage.GameStates {
             float newX = Mathf.Clamp(beginRot.x - mouse.y, -90, 90);
             param.mousePosition.y = mousePos.y - (beginRot.x - newX) / speed;
             float newY = beginRot.y + mouse.x;
-            self.cameraController.rotation.Set(Quaternion.Euler(newX, newY, 0));
+            self.camera.rotation.Set(Quaternion.Euler(newX, newY, 0));
         }
         public override void Enter(object obj) {
             param = obj as Param;
@@ -65,10 +62,10 @@ namespace Stage.GameStates {
             }
 
             // 计算目标视角
-            var target = self.cameraController.GetTargetView(isPersp);
+            var target = self.camera.GetTargetView(isPersp);
             self.map.view = target;
             // 摄像机吸附
-            self.cameraController.SetView(self.map.view);
+            self.camera.SetView(self.map.view);
         }
     }
 }

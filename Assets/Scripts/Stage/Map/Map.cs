@@ -31,6 +31,10 @@ namespace Stage {
                 goals[goal.position] = goal;
             }
             players.Sort((Player L, Player R) => L.playerId.CompareTo(R.playerId));
+            for(int i = 0; i < players.Count; ++i) {
+                int j = (i + 1) % players.Count;
+                players[i].nextPlayer = players[j];
+            }
             view = initView;
         }
 

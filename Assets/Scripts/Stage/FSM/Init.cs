@@ -17,8 +17,8 @@ namespace Stage.GameStates {
             string json = TestScript.Level1();
 
             self.LoadLevel(LevelData.Level.FromJson(json));
-            self.cameraController.SetView(self.map.view);
-            self.cameraController.Init();
+            self.camera.SetView(self.map.view);
+            self.camera.Init();
 
             fsm.Translate<Idle>();
         }

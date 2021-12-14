@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Stage.Objects;
 using Templates.FSM;
+using static Stage.Config.Static.Animation.Move;
 
 namespace Stage.GameStates {
     public class Move : FSMState<LevelManager> {
@@ -10,18 +11,14 @@ namespace Stage.GameStates {
             public int direction;
         }
 
-        private const float time = 0.2f;
-        private static float Smooth(float x) {
-            return 1 - Mathf.Pow(1 - x, 2);
-        }
-
         private Param param;
-        private readonly Dictionary<Item, Vector3> oldPos = new();
+        private readonly List<Item> items = new();
 
         private float curTime;
         private int nextDirection;
 
         public override void Update() {
+            // 读取下一步移动按键
             if (Direction.Get() != Direction.None) {
                 nextDirection = Direction.Get();
             }
@@ -32,9 +29,8 @@ namespace Stage.GameStates {
 
             // 更新坐标
             float moved = curTime / time;
-            foreach (var (item, pos) in oldPos) {
-                var curPos = Vector3.Lerp(pos, item.position, Smooth(moved));
-                item.transform.position = curPos;
+            foreach (var item in items) {
+                item.instance.GetComponent<AnimController>().Move(moved);
             }
         }
         public override void Enter(object obj) {
@@ -48,13 +44,16 @@ namespace Stage.GameStates {
 
             curTime = 0;
             nextDirection = Direction.None;
-            oldPos.Clear();
+            items.Clear();
+
             foreach (var (item, _) in moveData) {
-                oldPos[item] = item.transform.position;
+                items.Add(item);
+                var anim = item.instance.GetComponent<AnimController>();
+                anim.Prepare(item.position);
             }
         }
         public override void Exit(object obj) {
-            foreach (var (item, _) in oldPos) {
+            foreach (var item in items) {
                 item.transform.position = item.position;
             }
 

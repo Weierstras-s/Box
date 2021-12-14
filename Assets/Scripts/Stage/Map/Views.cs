@@ -156,15 +156,15 @@ namespace Stage.Views {
                     Vector2Int p2 = p1 + new Vector2Int(1, 0);
                     if (proj.TryGetValue(p1, out var ls1)) {
                         foreach (Item item in ls1) {
-                            if (item is not Floor) continue;
                             var pos = item.position;
+                            if (item is not Floor) continue;
                             if (pos.y > to.y && pos.y <= from.y + 1) return true;
                         }
                     }
                     if (proj.TryGetValue(p2, out var ls2)) {
                         foreach (Item item in ls2) {
-                            if (item is not Floor) continue;
                             var pos = item.position;
+                            if (item is not Floor) continue;
                             if (pos.y > to.y && pos.y <= from.y + 1) return true;
                         }
                     }
@@ -173,22 +173,22 @@ namespace Stage.Views {
                     Vector2Int p2 = p1 + new Vector2Int(0, 1);
                     if (proj.TryGetValue(p1, out var ls1)) {
                         foreach (Item item in ls1) {
-                            if (item is not Floor) continue;
                             var pos = item.position;
+                            if (item is not Floor) continue;
                             if (pos.y > to.y && pos.y <= from.y + 1) return true;
                         }
                     }
                     if (proj.TryGetValue(p2, out var ls2)) {
                         foreach (Item item in ls2) {
-                            if (item is not Floor) continue;
                             var pos = item.position;
+                            if (item is not Floor) continue;
                             if (pos.y > to.y && pos.y <= from.y + 1) return true;
                         }
                     }
                 }
                 return false;
             }
-
+            
             // 建边
             foreach (var (_, item) in nodes) {
                 var ori = Plain(item.position);

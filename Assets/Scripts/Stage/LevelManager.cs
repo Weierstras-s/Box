@@ -9,10 +9,10 @@ using Stage.Views;
 namespace Stage {
     public class LevelManager : MonoBehaviour {
         public static LevelManager manager { get; private set; }
-        public static FSM<LevelManager> fsm;
+        private static FSM<LevelManager> fsm;
 
         public Map map;
-        public CameraController cameraController;
+        public new CameraController camera;
 
         public List<Orthogonal> views;
         public Player player;
@@ -33,8 +33,7 @@ namespace Stage {
             views = data.Find<Orthogonal>("");
 
             foreach (var (pos, item) in map.items) {
-                var obj = GetPrefab(item);
-                item.instance = Instantiate(obj, pos, new Quaternion());
+                item.SetInstance(GetPrefab(item), pos);
             }
         }
 
@@ -48,7 +47,7 @@ namespace Stage {
             fsm.AddState<SwitchLevel>();
             fsm.EnterState<Init>();
 
-            cameraController = Camera.main.GetComponent<CameraController>();
+            camera = Camera.main.GetComponent<CameraController>();
         }
         private void Update() {
             fsm.Update();
