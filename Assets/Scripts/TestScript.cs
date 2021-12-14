@@ -15,20 +15,20 @@ namespace Stage {
                 data.Add("", item);
             }
 
-            /*Add(new Player() { 
+            Add(new Player() { 
                 playerId = 0,
                 position = new(0, 1, 0)
             });
             Add(new Player() { 
                 playerId = 1,
                 position = new(0, 2, 0)
-            });*/
+            });
 
-            Add(new Player() {
+            /*Add(new Player() {
                 playerId = 0,
                 position = new(1, 1, 0)
             });
-            Add(new Box() { position = new(0, 1, 0) });
+            Add(new Box() { position = new(0, 1, 0) });*/
 
             Add(new Floor() { position = new(0, 0, 0) });
             Add(new Floor() { position = new(0, 0, -1) });

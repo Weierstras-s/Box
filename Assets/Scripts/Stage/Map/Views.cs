@@ -31,7 +31,7 @@ namespace Stage.Views {
             }
         }
     }
-    
+
     /// <summary> 正交基类 </summary>
     public class Orthogonal : BaseView {
         /// <summary> 方向 id </summary>
@@ -154,41 +154,55 @@ namespace Stage.Views {
                 if (dx != 0) {
                     Vector2Int p1 = Plain(from) + new Vector2Int(1, 1);
                     Vector2Int p2 = p1 + new Vector2Int(1, 0);
-                    if (proj.TryGetValue(p1, out var ls1)) {
-                        foreach (Item item in ls1) {
+                    Vector2Int p3 = Plain(from) + new Vector2Int(1, 0);
+                    if (proj.TryGetValue(p1, out var ls)) {
+                        foreach (Item item in ls) {
                             var pos = item.position;
-                            if (item is not Floor) continue;
-                            if (pos.y > to.y && pos.y <= from.y + 1) return true;
+                            //if (item is not Floor) continue;
+                            //if (pos.y > to.y && pos.y <= from.y + 1) return true;
+                            if (pos.y > to.y && pos.y <= from.y) return true;
                         }
                     }
-                    if (proj.TryGetValue(p2, out var ls2)) {
-                        foreach (Item item in ls2) {
+                    if (proj.TryGetValue(p2, out ls)) {
+                        foreach (Item item in ls) {
                             var pos = item.position;
-                            if (item is not Floor) continue;
-                            if (pos.y > to.y && pos.y <= from.y + 1) return true;
+                            //if (item is not Floor) continue;
+                            //if (pos.y > to.y && pos.y <= from.y + 1) return true;
+                            if (pos.y > to.y + 1 && pos.y <= from.y + 1) return true;
+                        }
+                    }
+                    if (proj.TryGetValue(p3, out ls)) {
+                        foreach (Item item in ls) {
+                            var pos = item.position;
+                            if (pos.y > to.y && pos.y <= from.y) return true;
                         }
                     }
                 } else if (dy != 0) {
                     Vector2Int p1 = Plain(from) + new Vector2Int(1, 1);
                     Vector2Int p2 = p1 + new Vector2Int(0, 1);
-                    if (proj.TryGetValue(p1, out var ls1)) {
-                        foreach (Item item in ls1) {
+                    Vector2Int p3 = Plain(from) + new Vector2Int(0, 1);
+                    if (proj.TryGetValue(p1, out var ls)) {
+                        foreach (Item item in ls) {
                             var pos = item.position;
-                            if (item is not Floor) continue;
-                            if (pos.y > to.y && pos.y <= from.y + 1) return true;
+                            if (pos.y > to.y && pos.y <= from.y) return true;
                         }
                     }
-                    if (proj.TryGetValue(p2, out var ls2)) {
-                        foreach (Item item in ls2) {
+                    if (proj.TryGetValue(p2, out ls)) {
+                        foreach (Item item in ls) {
                             var pos = item.position;
-                            if (item is not Floor) continue;
-                            if (pos.y > to.y && pos.y <= from.y + 1) return true;
+                            if (pos.y > to.y + 1 && pos.y <= from.y + 1) return true;
+                        }
+                    }
+                    if (proj.TryGetValue(p3, out ls)) {
+                        foreach (Item item in ls) {
+                            var pos = item.position;
+                            if (pos.y > to.y && pos.y <= from.y) return true;
                         }
                     }
                 }
                 return false;
             }
-            
+
             // 建边
             foreach (var (_, item) in nodes) {
                 var ori = Plain(item.position);
@@ -243,32 +257,69 @@ namespace Stage.Views {
             // 判断是否连通
             bool Blocked(Vector3Int from, Vector3Int to, Vector2Int delta) {
                 var (dx, dy) = (delta.x, delta.y);
-                if (dx < 0 || dy < 0) {
-                    dx *= -1; dy *= -1;
+                if (dy < 0) {
+                    dy *= -1;
                     Common.Swap(ref from, ref to);
                 }
-                if (dx != 0) {
+                if (dx > 0) {
                     Vector2Int p1 = Plain(from) + new Vector2Int(1, 1);
-                    if (proj.TryGetValue(p1, out var ls1)) {
-                        foreach (Item item in ls1) {
-                            if (item is not Floor) continue;
+                    Vector2Int p2 = Plain(from) + new Vector2Int(1, 0);
+                    Vector2Int p3 = Plain(from);
+                    if (proj.TryGetValue(p1, out var ls)) {
+                        foreach (Item item in ls) {
                             var pos = item.position;
-                            if (pos.y > to.y && pos.y <= from.y + 1) return true;
+                            //if (item is not Floor) continue;
+                            //if (pos.y > to.y && pos.y <= from.y + 1) return true;
+                            if (pos.y > to.y + 1) return true;
+                        }
+                    }
+                    if (proj.TryGetValue(p2, out ls)) {
+                        foreach (Item item in ls) {
+                            var pos = item.position;
+                            if (pos.y > to.y && pos.y <= from.y) return true;
+                        }
+                    }
+                    if (proj.TryGetValue(p3, out ls)) {
+                        foreach (Item item in ls) {
+                            var pos = item.position;
+                            if (pos.y <= to.y && pos.y > from.y) return true;
+                        }
+                    }
+                } else if (dx < 0) {
+                    Vector2Int p1 = Plain(from) + new Vector2Int(-1, 1);
+                    Vector2Int p2 = Plain(from) + new Vector2Int(-1, 0);
+                    Vector2Int p3 = Plain(from);
+                    if (proj.TryGetValue(p1, out var ls)) {
+                        foreach (Item item in ls) {
+                            var pos = item.position;
+                            if (pos.y > to.y + 1) return true;
+                        }
+                    }
+                    if (proj.TryGetValue(p2, out ls)) {
+                        foreach (Item item in ls) {
+                            var pos = item.position;
+                            if (pos.y > to.y && pos.y <= from.y) return true;
+                        }
+                    }
+                    if (proj.TryGetValue(p3, out ls)) {
+                        foreach (Item item in ls) {
+                            var pos = item.position;
+                            if (pos.y <= to.y && pos.y > from.y) return true;
                         }
                     }
                 } else if (dy != 0) {
                     if (to.y > from.y) return true;
                     Vector2Int p1 = Plain(from) + new Vector2Int(0, 2);
                     Vector2Int p2 = Plain(from) + new Vector2Int(0, 1);
-                    if (proj.TryGetValue(p1, out var ls1)) {
-                        foreach (Item item in ls1) {
+                    if (proj.TryGetValue(p1, out var ls)) {
+                        foreach (Item item in ls) {
                             if (item is not Floor) continue;
                             var pos = item.position;
                             if (pos.y > to.y && pos.y <= from.y + 1) return true;
                         }
                     }
-                    if (proj.TryGetValue(p2, out var ls2)) {
-                        foreach (Item item in ls2) {
+                    if (proj.TryGetValue(p2, out ls)) {
+                        foreach (Item item in ls) {
                             var pos = item.position;
                             if (pos.y > to.y && pos.y <= from.y) return true;
                             if (pos.y == from.y + 1 && item is Floor) return true;

@@ -13,6 +13,7 @@ namespace Stage.Config.Static {
             public const float camFar = 1000f;
             public const float camField = 20f;
         }
+
         public class Controller {
             public const float nearDist = 10f;
             public const float farDist = 30f;
@@ -25,9 +26,13 @@ namespace Stage.Config.Static {
             public const float switchTimeTolerance = 0.08f;
         }
     }
+
     namespace Animation {
         public class Move {
             public const float time = 0.2f;
+            public static float Smooth(float x) {
+                return 1 - Mathf.Pow(1 - x, 2);
+            }
         }
     }
 }

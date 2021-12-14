@@ -2,23 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Utils;
+using static Stage.Config.Static.Animation.Move;
 
 namespace Stage {
     /// <summary>
     /// 动画控制类
     /// </summary>
     public class AnimController : MonoBehaviour {
-        private static float Smooth(float x) {
-            return 1 - Mathf.Pow(1 - x, 2);
-        }
-
         private Vector3 from;
         private Vector3 dest;
         private Vector3 dir;
 
         /// <summary> 初始化移动 </summary>
         /// <param name="dest"> 目标 </param>
-        /// <param name="dir"> 方向 (平面上) </param>
         public void Prepare(Vector3 dest) {
             from = transform.position;
             this.dest = dest;
