@@ -28,7 +28,7 @@ namespace Stage.GameStates {
             }
 
             // 更新坐标
-            float moved = curTime / time;
+            float moved = Smooth(curTime / time);
             foreach (var item in items) {
                 item.instance.GetComponent<AnimController>().Move(moved);
             }
@@ -49,17 +49,23 @@ namespace Stage.GameStates {
             foreach (var (item, _) in moveData) {
                 items.Add(item);
                 var anim = item.instance.GetComponent<AnimController>();
-                anim.Prepare(item.position);
+                anim.Prepare(item.position, param.direction == Direction.Rollback);
             }
         }
         public override void Exit(object obj) {
             foreach (var item in items) {
                 item.transform.position = item.position;
+                item.instance.GetComponent<AnimController>().Exit();
             }
+            items.Clear();
 
             // 如果缓冲区内有按键或按着不放则继续移动
             if (nextDirection == Direction.None) {
                 nextDirection = Direction.Get(Input.GetKey);
+                // 撤销不能连续按
+                if (nextDirection == Direction.Rollback) {
+                    nextDirection = Direction.None;
+                }
             }
             if (nextDirection != Direction.None) {
                 fsm.EnterState<Move>(new Param() {
