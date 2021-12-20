@@ -8,127 +8,63 @@ using Stage.Views;
 
 namespace Stage {
     public class TestScript : MonoBehaviour {
-        public static string Level1() {
-            LevelData.Level data = new();
-
-            void Add(object item) {
-                data.Add("", item);
-            }
-
-            Add(new Player() { 
-                playerId = 0,
-                position = new(0, 1, 0)
-            });
-            Add(new Player() { 
-                playerId = 1,
-                position = new(0, 2, 0)
-            });
-
-            /*Add(new Player() {
-                playerId = 0,
-                position = new(1, 1, 0)
-            });
-            Add(new Box() { position = new(0, 1, 0) });*/
-
-            Add(new Floor() { position = new(0, 0, 0) });
-            Add(new Floor() { position = new(0, 0, -1) });
-            Add(new Floor() { position = new(0, 0, 1) });
-            Add(new Floor() { position = new(-1, 0, 0) });
-            Add(new Floor() { position = new(-1, 0, -1) });
-            Add(new Floor() { position = new(-1, 0, 1) });
-            Add(new Floor() { position = new(1, 0, 0) });
-            Add(new Floor() { position = new(1, 0, -1) });
-            Add(new Floor() { position = new(1, 0, 1) });
-
-            Add(new Floor() { position = new(0, 1, -3) });
-            Add(new Floor() { position = new(0, 1, -4) });
-            Add(new Floor() { position = new(0, 1, 3) });
-            Add(new Floor() { position = new(0, 1, 4) });
-            Add(new Floor() { position = new(-3, 1, 0) });
-            Add(new Floor() { position = new(-4, 1, 0) });
-            Add(new Floor() { position = new(3, 1, 0) });
-            Add(new Floor() { position = new(4, 1, 0) });
-
-            Add(new Box() { position = new(-1, 1, -1) });
-            Add(new Box() { position = new(-1, 1, 1) });
-            Add(new Box() { position = new(1, 1, -1) });
-            Add(new Box() { position = new(1, 1, 1) });
-
-            Add(new Goal() { position = new(0, 2, -4) });
-            Add(new Goal() { position = new(0, 2, 4) });
-            Add(new Goal() { position = new(-4, 2, 0) });
-            Add(new Goal() { position = new(4, 2, 0) });
-
-            Add(new Vertex(0));
-            Add(new Vertex(1));
-            Add(new Vertex(2));
-            Add(new Vertex(3));
-            Add(new Edge(0));
-            Add(new Edge(1));
-            Add(new Edge(2));
-            Add(new Edge(3));
-            Add(new Face(0));
-            Add(new Face(1));
-            Add(new Face(2));
-            Add(new Face(3));
-
-            data.Add("Views.Default", new Vertex(0));
-
-            string s = data.ToJson();
-            Debug.Log(s);
-            return s;
-        }
         public static string Level2() {
             LevelData.Level data = new();
 
             void Add(object item) {
-                data.Add("", item);
+                data.Add("Objects", item);
             }
             
-            Add(new Player() { position = new(-1, 1, -1) });
+            Add(new Goal() { position = new(100000, 100000, 100000) });
+            Add(new Player() { position = new(0, 1, 0) });
 
-            Add(new Floor() { position = new(0, 0, 0) });
-            Add(new Floor() { position = new(0, 0, -1) });
-            Add(new Floor() { position = new(0, 0, 1) });
-            Add(new Floor() { position = new(-1, 0, 0) });
-            Add(new Floor() { position = new(-1, 0, -1) });
-            Add(new Floor() { position = new(-1, 0, 1) });
-            Add(new Floor() { position = new(1, 0, 0) });
-            Add(new Floor() { position = new(1, 0, -1) });
-            Add(new Floor() { position = new(1, 0, 1) });
-            Add(new Floor() { position = new(0, 1, -3) });
-            Add(new Floor() { position = new(0, 1, -4) });
-            Add(new Floor() { position = new(0, 1, 3) });
-            Add(new Floor() { position = new(0, 1, 4) });
-            Add(new Floor() { position = new(-3, 1, 0) });
-            Add(new Floor() { position = new(-4, 1, 0) });
-            Add(new Floor() { position = new(3, 1, 0) });
-            Add(new Floor() { position = new(4, 1, 0) });
-            Add(new Goal() { position = new(-10, -10, -10) });
+            for(int i = -2; i <= 2; ++i) {
+                for(int j = -2; j <= 2; ++j) {
+            Add(new Floor() { position = new(i, 0, j) });
+                }
+            }
+            for(int i = 3; i <= 30; ++i) {
+                Add(new Floor() { position = new(i, 0, 0) });
+            }
 
-            Add(new Box() { position = new(0, 1, -1) });
-            Add(new Box() { position = new(1, 1, -1) });
-            Add(new Floor() { position = new(2, 0, -1) });
+            for(int i = 1; i <= 5; ++i) {
+                int x = 3 * i + 2;
+                Add(new Box() { position = new(x, 1, 1) });
+                Add(new LevelSelector() { position = new(x, 1, 2), name = i.ToString() });
+                Add(new Floor() { position = new(x, 0, 1) });
+                Add(new Floor() { position = new(x, 0, 2) });
+                Add(new Effect() {
+                    position = new(x, 1, 0),
+                    script = "ShowInfo",
+                    args = new() {
+                        { "msg", $"Level {i}" },
+                        { "pos", $"{x},1,2" },
+                        { "offset", "45" },
+                    }
+                });
+            }
 
-            Add(new Box() { position = new(3, 2, 0) });
+            data.Add("Objects.Controlled", new ControlledFloor() { position = new(0, 0, 3), id = "0" });
+            data.Add("Objects.Controlled", new ControlledFloor() { position = new(1, 0, 3), id = "1", active = true });
+            Add(new Effect() {
+                position = new(1, 1, 0),
+                script = "ButtonX",
+                args = new() {
+                    { "id", "1" },
+                }
+            });
+            Add(new Effect() {
+                position = new(-1, 1, 0),
+                script = "ButtonO",
+                args = new() {
+                    { "id", "0" },
+                }
+            });
 
-            Add(new Floor() { position = new(2, 2, 4) });
-            Add(new Floor() { position = new(0, 2, 5) });
-            Add(new Floor() { position = new(1, 2, 3) });
-            Add(new Floor() { position = new(-1, 0, -2) });
-
-            Add(new Vertex(0));
-            Add(new Vertex(1));
-            Add(new Vertex(2));
-            Add(new Vertex(3));
-            Add(new Edge(0));
-            Add(new Edge(1));
-            Add(new Edge(2));
-            Add(new Edge(3));
-            Add(new Face(0));
-            Add(new Face(1));
-            Add(new Face(2));
-            Add(new Face(3));
+            data.Add("Views", new Face(0));
+            data.Add("Views", new Face(1));
+            data.Add("Views", new Face(2));
+            data.Add("Views", new Face(3));
 
             data.Add("Views.Default", new Face(0));
 

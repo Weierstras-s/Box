@@ -8,9 +8,15 @@ namespace Stage {
     using MoveData = Dictionary<Item, (Vector3Int, Vector3Int)>;
 
     public class Map {
+        // All objects
         public readonly Dictionary<Vector3Int, Item> items = new();
+        public readonly Dictionary<Vector3Int, Trigger> triggers = new();
+
         public readonly List<Player> players = new();
         public readonly Dictionary<Vector3Int, Goal> goals = new();
+
+        public System.Action triggerAction;
+
         private Views.BaseView m_view;
         public Views.BaseView view {
             get => m_view;
@@ -20,18 +26,23 @@ namespace Stage {
         private readonly Dictionary<Item, Item[]> edges = new();
         private readonly Stack<MoveData> moveHistory = new();
 
-        public Map(List<Item> itemData, List<Goal> goalData, Views.BaseView initView) {
+        public Map(List<Item> itemData, List<Trigger> triggerData, Views.BaseView initView) {
             foreach (var item in itemData) {
                 items[item.position] = item;
                 if (item is Player player) {
                     players.Add(player);
                 }
             }
-            foreach (var goal in goalData) {
-                goals[goal.position] = goal;
+
+            foreach (var trigger in triggerData) {
+                triggers[trigger.position] = trigger;
+                if (trigger is Goal goal) {
+                    goals[goal.position] = goal;
+                }
             }
+
             players.Sort((Player L, Player R) => L.playerId.CompareTo(R.playerId));
-            for(int i = 0; i < players.Count; ++i) {
+            for (int i = 0; i < players.Count; ++i) {
                 int j = (i + 1) % players.Count;
                 players[i].nextPlayer = players[j];
             }
@@ -48,19 +59,23 @@ namespace Stage {
             return true;
         }
 
-        private void Build() {
+        public void Build() {
             edges.Clear();
             foreach (var (_, item) in items) {
                 edges[item] = new Item[4];
             }
-            view.nodes = items;
-            view.edges = edges;
-            view.Build();
+            view.Build(items, edges);
         }
 
         /// <summary> 尝试移动玩家, 方向为 0~3 </summary>
         /// <returns> 若可以移动返回移动信息, 否则返回 null </returns>
         public MoveData TryMove(Item player, int dir) {
+            // 透视按键映射
+            if (view is Views.Perspective) {
+                Quaternion cam = Camera.main.transform.rotation;
+                dir = Views.Perspective.DirectionMapping(dir, cam);
+            }
+
             MoveData ret = new();
             HashSet<Vector3Int> vis = new();
             bool Search(Vector3Int floor) {
@@ -90,18 +105,52 @@ namespace Stage {
             }
             return ret;
         }
+
         /// <summary> 根据移动信息移动玩家 </summary>
-        public void Move(MoveData data, bool rollback) {
+        private void Move(MoveData data, bool rollback) {
+            HashSet<Vector3Int> changed = new();
+            Dictionary<Vector3Int, Item> exitTrigger = new();
+            Dictionary<Vector3Int, Item> enterTrigger = new();
+
             foreach (var (item, _) in data) {
-                items.Remove(item.position);
+                var pos = item.position;
+                items.Remove(pos);
+
+                // 移出 trigger
+                if (triggers.ContainsKey(pos)) {
+                    changed.Add(pos);
+                    exitTrigger[pos] = item;
+                }
             }
+
             foreach (var (item, (oldPos, newPos)) in data) {
                 var pos = rollback ? oldPos : newPos;
                 item.position = pos;
                 items[pos] = item;
+
+                // 移入 trigger
+                if (triggers.ContainsKey(pos)) {
+                    changed.Add(pos);
+                    enterTrigger[pos] = item;
+                }
             }
             if (!rollback) moveHistory.Push(data);
             Build();
+
+            // 触发 trigger 动作
+            triggerAction = null;
+            foreach (var pos in changed) {
+                var trigger = triggers[pos];
+                enterTrigger.TryGetValue(pos, out var enter);
+                exitTrigger.TryGetValue(pos, out var exit);
+                if (enter != null && exit != null) {
+                    triggerAction += () => { trigger.OnSwitch(enter, exit); };
+                } else if (enter != null) {
+                    triggerAction += () => { trigger.OnEnter(enter); };
+                } else if (exit != null) {
+                    triggerAction += () => { trigger.OnExit(exit); };
+                }
+            }
         }
 
         /// <summary> 尝试移动玩家, 方向为 0~3 或 4 (回退) </summary>

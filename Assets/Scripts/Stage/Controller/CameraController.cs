@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Utils;
-using static Stage.LevelManager;
+using static Stage.StageManager;
 using static Stage.Config.Static.Camera.Projection;
 using static Stage.Config.Static.Camera.Controller;
 
@@ -43,14 +43,14 @@ namespace Stage {
         /// <summary> Õ∏ ”¬  </summary>
         public Smoothing<float> persp;
 
-
         private void Awake() {
             dist = new() {
-                Lerp = (float x, float y) => Mathf.Lerp(x, y, Common.Lerp()),
+                Lerp = (float x, float y) => Mathf.Lerp(x, y, Common.Damping()),
             };
+            dist.Init(defaultDist);
 
             center = new() {
-                Lerp = (Vector3 x, Vector3 y) => Vector3.Lerp(x, y, Common.Lerp()),
+                Lerp = (Vector3 x, Vector3 y) => Vector3.Lerp(x, y, Common.Damping()),
                 GetDest = () => {
                     if (manager.player == null) return center.current;
                     return manager.player.transform.position;
@@ -58,21 +58,21 @@ namespace Stage {
             };
 
             rotation = new() {
-                Lerp = (Quaternion x, Quaternion y) => Quaternion.Slerp(x, y, Common.Lerp()),
+                Lerp = (Quaternion x, Quaternion y) => Quaternion.Slerp(x, y, Common.Damping()),
                 GetCurrent = () => transform.rotation,
                 SetCurrent = (Quaternion x) => transform.rotation = x,
             };
 
             persp = new() {
-                Lerp = (float x, float y) => Mathf.Lerp(x, y, Common.Lerp()),
+                Lerp = (float x, float y) => Mathf.Lerp(x, y, Common.Damping()),
                 GetDest = () => {
                     if (manager.map is null) return persp.current;
                     return manager.map.view is Views.Orthogonal ? 0f : 1f;
                 },
             };
         }
+
         public void Init() {
-            dist.Init(defaultDist);
             center.Init();
             rotation.Init();
             persp.Init();
@@ -101,7 +101,7 @@ namespace Stage {
 
         public void UpdateDist(float delta) {
             delta *= -Config.Input.Mouse.camScrollSpeed;
-            dist.dest = Mathf.Clamp(dist.dest + delta, nearDist, farDist);
+            dist.Set(Mathf.Clamp(dist.dest + delta, nearDist, farDist));
         }
 
         private void Update() {

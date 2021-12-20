@@ -7,18 +7,14 @@ using Stage.Views;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Stage.LevelData.Json.Converters;
+using static Utils.Common;
 
 namespace Stage.LevelData.Json {
     namespace Converters {
         internal class Vector3IntConverter : JsonConverter<Vector3Int> {
             public override Vector3Int ReadJson(JsonReader reader, Type objectType,
                     Vector3Int existingValue, bool hasExistingValue, JsonSerializer serializer) {
-                var ls = (reader.Value as string).Split(',');
-                if (ls.Length != 3) throw new FormatException();
-                int x = int.Parse(ls[0]);
-                int y = int.Parse(ls[1]);
-                int z = int.Parse(ls[2]);
-                return new(x, y, z);
+                return ParseVector3Int(reader.Value as string);
             }
 
             public override void WriteJson(JsonWriter writer,
@@ -31,12 +27,7 @@ namespace Stage.LevelData.Json {
         internal class Vector3Converter : JsonConverter<Vector3> {
             public override Vector3 ReadJson(JsonReader reader, Type objectType,
                     Vector3 existingValue, bool hasExistingValue, JsonSerializer serializer) {
-                var ls = (reader.Value as string).Split(',');
-                if (ls.Length != 3) throw new FormatException();
-                float x = float.Parse(ls[0]);
-                float y = float.Parse(ls[1]);
-                float z = float.Parse(ls[2]);
-                return new(x, y, z);
+                return ParseVector3(reader.Value as string);
             }
 
             public override void WriteJson(JsonWriter writer,

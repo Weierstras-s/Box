@@ -8,14 +8,40 @@ namespace Stage {
     /// 动画控制类
     /// </summary>
     public class AnimController : MonoBehaviour {
+        public class CopiedController : MonoBehaviour {
+            public void SetDirection(Vector3 dir) {
+                GetComponent<MeshRenderer>().material.SetVector("_Direction", dir);
+            }
+            public void SetHeight(float x) {
+                GetComponent<MeshRenderer>().material.SetFloat("_Height", x + epsilon);
+            }
+            public void SetAlpha(float x) {
+                GetComponent<MeshRenderer>().material.SetFloat("_Alpha", x);
+            }
+        }
+
         private const float epsilon = 1e-2f;
+
+        private readonly Smoothing<float> alpha = new() {
+            Lerp = (float x, float y) => Mathf.Lerp(x, y, Common.Damping()),
+        };
+        public bool isOnGoal {
+            set => alpha.Set(value ? 1 : 0);
+        }
 
         private Vector3 from;
         private Vector3 dest;
         private Vector3 dir;
-        bool rollback;
+        private bool rollback;
 
-        private readonly List<AnimController> copies = new();
+        private readonly List<CopiedController> copies = new();
+
+        /// <summary> 复制实体 </summary>
+        public CopiedController Copy() {
+            var obj = Instantiate(gameObject);
+            obj.GetComponent<AnimController>().enabled = false;
+            return obj.AddComponent<CopiedController>();
+        }
 
         /// <summary> 初始化移动 </summary>
         /// <param name="dest"> 目标 </param>
@@ -23,7 +49,7 @@ namespace Stage {
             from = transform.position;
             this.dest = dest;
             this.rollback = rollback;
-
+            
             // 计算在平面上的移动方向
             static Vector3 Transform(Vector3 p) {
                 var d = Camera.main.transform.rotation * Vector3.forward;
@@ -35,13 +61,13 @@ namespace Stage {
 
             // 复制实例
             if (!rollback) {
-                copies.Add(Instantiate(gameObject).GetComponent<AnimController>());
+                copies.Add(Copy());
                 copies[0].transform.position = dest - dir;
                 SetDirection(dir);
                 copies[0].SetDirection(-dir);
             } else {
-                copies.Add(Instantiate(gameObject).GetComponent<AnimController>());
-                copies.Add(Instantiate(gameObject).GetComponent<AnimController>());
+                copies.Add(Copy());
+                copies.Add(Copy());
                 copies[0].transform.position = from;
                 copies[1].transform.position = dest;
                 SetHeight(-1);
@@ -56,6 +82,9 @@ namespace Stage {
         public void SetHeight(float x) {
             GetComponent<MeshRenderer>().material.SetFloat("_Height", x + epsilon);
         }
+        public void SetAlpha(float x) {
+            GetComponent<MeshRenderer>().material.SetFloat("_Alpha", x);
+        }
 
         public void Move(float x) {
             if (!rollback) {
@@ -66,11 +95,8 @@ namespace Stage {
                 copies[0].transform.position = dest - dir + moved;
             } else {
                 transform.position = Vector3.Lerp(from, dest, x);
-                copies[0].transform.localScale = (1 - x)*Vector3.one;
-                copies[1].transform.localScale = x*Vector3.one;
-                /*var moved = Vector3.down * x;
-                transform.position = from + moved;
-                copy.transform.position = dest - moved;*/
+                copies[0].transform.localScale = (1 - x) * Vector3.one;
+                copies[1].transform.localScale = x * Vector3.one;
             }
         }
 
@@ -81,6 +107,14 @@ namespace Stage {
                 Destroy(obj.gameObject);
             }
             copies.Clear();
+        }
+
+        private void Update() {
+            alpha.Update();
+            SetAlpha(alpha.current);
+            foreach (var obj in copies) {
+                obj.SetAlpha(alpha.current);
+            }
         }
     }
 }

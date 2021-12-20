@@ -5,14 +5,8 @@ using Templates.FSM;
 using static Stage.Config.Input.Keyboard;
 
 namespace Stage.GameStates {
-    public class Idle : FSMState<LevelManager> {
+    public class Idle : FSMState<StageManager> {
         public Idle() {
-            // 通关
-            AddTransition<SwitchLevel>((ref object enter, ref object exit) => {
-                if (!self.map.IsWin()) return false;
-                return true;
-            });
-
             // 单击鼠标左键移动摄像机
             AddTransition<AdjustCamera>((ref object enter, ref object exit) => {
                 if (!Input.GetMouseButtonDown(0)) return false;
@@ -42,6 +36,22 @@ namespace Stage.GameStates {
             // 玩家切换
             if (Input.GetKeyDown(keySwitchPlayer)) {
                 self.player = self.player.nextPlayer;
+            }
+
+            // 重载关卡
+            if (Input.GetKeyDown(keyRestart)) {
+                var level = LevelData.LevelManager.LoadFromFile(self.currentLevel.name);
+                self.SwitchLevel(level);
+            }
+
+            // 退出关卡
+            if (Input.GetKeyDown(keyExit)) {
+                if (self.currentLevel.name == "main") {
+                    Debug.Log("exit");
+                } else {
+                    var level = LevelData.LevelManager.PrevLevel(self.currentLevel);
+                    self.SwitchLevel(level);
+                }
             }
         }
         public override void Enter(object obj) {

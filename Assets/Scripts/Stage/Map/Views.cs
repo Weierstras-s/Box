@@ -11,12 +11,33 @@ namespace Stage.Views {
         public Dictionary<Item, Item[]> edges;
 
         /// <summary> 建图并存入 edges </summary>
-        public virtual void Build() { }
+        public void Build(Dictionary<Vector3Int, Item> nodes,
+                Dictionary<Item, Item[]> edges) {
+            this.nodes = nodes;
+            this.edges = edges;
+            Build();
+        }
+
+        protected virtual void Build() { }
     }
 
     /// <summary> 透视 </summary>
     public class Perspective : BaseView {
-        public override void Build() {
+        /// <summary> 计算按键的实际方向 </summary>
+        public static int DirectionMapping(int dir, Quaternion cam) {
+            if (dir == Direction.Rollback) return dir;
+            int ret = 0;
+            float minW = float.PositiveInfinity;
+            for (int y = 0; y < 4; ++y) {
+                var dest = Quaternion.Euler(0, -y * 90, 0);
+                float w = Quaternion.Angle(cam, dest);
+                if (w > minW) continue;
+                minW = w; ret = y;
+            }
+            return (dir + ret) % 4;
+        }
+
+        protected override void Build() {
             // 相邻方块连边
             foreach (var (ori, item) in nodes) {
                 Vector3Int delta = new(1, 0, 0);
@@ -79,7 +100,7 @@ namespace Stage.Views {
             return new(p.x, p.z);
         }
 
-        public override void Build() {
+        protected override void Build() {
             Dictionary<Vector2Int, (Item, int)> proj = new();
             Dictionary<Vector2Int, (Item, int)> box = new();
             Rotate(directionId);
@@ -132,7 +153,7 @@ namespace Stage.Views {
             return new(p.x + p.y, p.z + p.y);
         }
 
-        public override void Build() {
+        protected override void Build() {
             Dictionary<Vector2Int, List<Item>> proj = new();
             Rotate(directionId);
 
@@ -243,7 +264,7 @@ namespace Stage.Views {
             return new(p.x, p.z + p.y);
         }
 
-        public override void Build() {
+        protected override void Build() {
             Dictionary<Vector2Int, List<Item>> proj = new();
             Rotate(directionId);
 

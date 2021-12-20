@@ -5,7 +5,7 @@ using Templates.FSM;
 using static Stage.Config.Static.Camera.Controller;
 
 namespace Stage.GameStates {
-    public class AdjustCamera : FSMState<LevelManager> {
+    public class AdjustCamera : FSMState<StageManager> {
         public class Param {
             /// <summary> ЪѓБъзјБъ </summary>
             public Vector3 mousePosition;

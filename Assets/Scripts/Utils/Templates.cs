@@ -49,12 +49,15 @@ namespace Templates {
 			}
 
 			private readonly Queue<Action> actions = new();
+			public void ClearActions() {
+				actions.Clear();
+            }
 			public void ExitState(object exit = null) {
 				actions.Enqueue(() => {
 					if (currentState == null) return;
 					var prevState = currentState;
 					currentState = null;
-					// Log($"Exit {prevState.GetType().Name}");
+					//Log($"Exit {prevState.GetType().Name}");
 					prevState.Exit(exit);
 				});
 			}
@@ -63,7 +66,7 @@ namespace Templates {
 				actions.Enqueue(() => {
 					if (currentState != null) return;
 					var nextState = stateDic[state];
-					// Log($"Enter {nextState.GetType().Name}");
+					//Log($"Enter {nextState.GetType().Name}");
 					nextState.Enter(enter);
 					currentState = nextState;
 				});

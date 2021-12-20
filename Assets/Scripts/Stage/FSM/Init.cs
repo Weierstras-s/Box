@@ -2,10 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Templates.FSM;
-using static Stage.CameraController;
 
 namespace Stage.GameStates {
-    public class Init : FSMState<LevelManager> {
+    public class Init : FSMState<StageManager> {
         public Init() {
 
         }
@@ -14,9 +13,9 @@ namespace Stage.GameStates {
 
         }
         public override void Enter(object obj) {
-            string json = TestScript.Level1();
+            var level = obj as LevelData.Level;
 
-            self.LoadLevel(LevelData.Level.FromJson(json));
+            self.LoadLevel(level);
             self.camera.SetView(self.map.view);
             self.camera.Init();
 

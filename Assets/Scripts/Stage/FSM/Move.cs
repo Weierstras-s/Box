@@ -6,7 +6,7 @@ using Templates.FSM;
 using static Stage.Config.Static.Animation.Move;
 
 namespace Stage.GameStates {
-    public class Move : FSMState<LevelManager> {
+    public class Move : FSMState<StageManager> {
         public class Param {
             public int direction;
         }
@@ -14,6 +14,7 @@ namespace Stage.GameStates {
         private Param param;
         private readonly List<Item> items = new();
 
+        private bool moveFailed;
         private float curTime;
         private int nextDirection;
 
@@ -35,9 +36,11 @@ namespace Stage.GameStates {
         }
         public override void Enter(object obj) {
             param = obj as Param;
+
             // 判断是否能够移动
             var moveData = self.map.Move(self.player, param.direction);
-            if (moveData == null) {
+            moveFailed = moveData == null;
+            if (moveFailed) {
                 fsm.Translate<Idle>();
                 return;
             }
@@ -53,6 +56,9 @@ namespace Stage.GameStates {
             }
         }
         public override void Exit(object obj) {
+            // 如果没有箱子移动直接退出
+            if (moveFailed) return;
+
             foreach (var item in items) {
                 item.transform.position = item.position;
                 item.instance.GetComponent<AnimController>().Exit();
@@ -67,11 +73,24 @@ namespace Stage.GameStates {
                     nextDirection = Direction.None;
                 }
             }
+            fsm.EnterState<Idle>();
             if (nextDirection != Direction.None) {
-                fsm.EnterState<Move>(new Param() {
+                fsm.Translate<Move>(new Param() {
                     direction = nextDirection,
                 });
-            } else fsm.EnterState<Idle>();
+            }
+
+            // 触发 trigger
+            if (self.map.triggerAction != null) {
+                self.map.triggerAction.Invoke();
+                self.map.triggerAction = null;
+            }
+
+            // 通关
+            if (self.map.IsWin()) {
+                self.SwitchLevel(LevelData.LevelManager.NextLevel(self.currentLevel));
+                return;
+            }
         }
     }
 }
