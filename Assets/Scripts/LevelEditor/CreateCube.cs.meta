@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 889ca3e5d0f9e274f91ceabdbe42ba27
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - Precube: {fileID: 6621943197331442218, guid: 7c37df8dfc164e944a19c1b4baa65508, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
