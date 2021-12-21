@@ -81,15 +81,6 @@ namespace Stage.Objects {
         }
     }
 
-    public class LevelSelector : Trigger {
-        [JsonProperty] public string name;
-
-        public override void OnEnter(Item enter) {
-            var level = LevelData.LevelManager.LoadFromFile(name);
-            StageManager.manager.SwitchLevel(level);
-        }
-    }
-
     public class Effect : Trigger {
         [JsonProperty] public string script;
         [JsonProperty] public Dictionary<string, string> args;

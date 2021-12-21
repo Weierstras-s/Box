@@ -1,0 +1,47 @@
+{
+  "General": {
+    "PrevLevel": { "String": [ "1" ] },
+    "NextLevel": { "String": [ "1-5" ] },
+  },
+  "Objects": {
+    "Player": [
+      {
+        "playerId": 0,
+        "mask": -1,
+        "position": "0,1,0"
+      }
+    ],
+    "Floor": [
+      { "position": "0,0,0" },
+      { "position": "0,0,1" },
+      { "position": "0,0,2" },
+      { "position": "0,0,3" },
+      { "position": "1,1,5" },
+      { "position": "2,1,5" },
+      { "position": "4,2,4" },
+      { "position": "4,2,3" },
+      { "position": "6,3,4" },
+      { "position": "7,3,4" },
+      { "position": "9,4,3" },
+      { "position": "9,4,2" },
+      { "position": "9,4,1" },
+      { "position": "11,5,2" },
+      
+      { "position": "4,1,1" },
+      { "position": "4,1,0" },
+    ],
+    "Goal": [
+      { "isPlayer": false, "position": "4,2,0" },
+      { "isPlayer": true, "position": "0,1,0" },
+    ],
+    "Box": [
+      { "position": "9,5,2" },
+    ]
+  },
+  "Views": {
+    "Default": { "Vertex": [ 0 ] },
+    "Vertex": [ 0, 1, 2, 3 ],
+    "Edge": [ 0, 1, 2, 3 ],
+    "Face": [ 0, 1, 2, 3 ]
+  }
+}

@@ -47,7 +47,11 @@ namespace Stage.GameStates {
             // ÍË³ö¹Ø¿¨
             if (Input.GetKeyDown(keyExit)) {
                 if (self.currentLevel.name == "main") {
-                    Debug.Log("exit");
+#if UNITY_EDITOR
+                    UnityEditor.EditorApplication.isPlaying = false;
+#else
+                    Application.Quit();
+#endif
                 } else {
                     var level = LevelData.LevelManager.PrevLevel(self.currentLevel);
                     self.SwitchLevel(level);

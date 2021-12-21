@@ -37,7 +37,6 @@ namespace Stage {
                     if (goal.isPlayer) return "Goal-Player";
                     return "Goal-Box";
                 }
-                if (item is LevelSelector) return "LevelSelector";
                 return "";
             }
             var obj = Resources.Load<GameObject>("Prefabs/" + GetName());
@@ -67,6 +66,7 @@ namespace Stage {
             }
             foreach (var (pos, obj) in map.triggers) {
                 obj.SetInstance(GetPrefab(obj), pos);
+                // 进入关卡时触发机关
                 if (map.items.TryGetValue(pos, out var item)) {
                     obj.OnEnter(item);
                 }
@@ -83,6 +83,12 @@ namespace Stage {
         }
 
         public void SwitchLevel(Level level) {
+            // 退出关卡时移出机关
+            foreach (var (pos, obj) in map.triggers) {
+                if (map.items.TryGetValue(pos, out var item)) {
+                    obj.OnExit(item);
+                }
+            }
             fsm.ClearActions();
             fsm.Translate<SwitchLevel>(level);
         }

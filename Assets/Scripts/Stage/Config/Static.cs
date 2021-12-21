@@ -15,12 +15,12 @@ namespace Stage.Config.Static {
         }
 
         public class Controller {
-            public const float nearDist = 10f;
-            public const float farDist = 30f;
-            public const float defaultDist = 15f;
+            public const float nearDist = 15f;
+            public const float farDist = 40f;
+            public const float defaultDist = 20f;
 
             /// <summary>  ”Ω«Œ¸∏Ω‘ –ÌŒÛ≤Ó∑∂Œß (Ω«∂») </summary>
-            public const float magTolerance = 45f;
+            public const float magTolerance = 180f;
 
             public const float switchDistTolerance = 5f;
             public const float switchTimeTolerance = 0.08f;

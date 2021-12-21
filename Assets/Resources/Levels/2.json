@@ -1,146 +1,133 @@
 {
+  "General": {
+    "PrevLevel": { "String": [ "main" ] },
+  },
   "Objects": {
     "Player": [
       {
         "playerId": 0,
-        "mask": -1,
-        "position": "-1,1,-1"
-      }
-    ],
-    "Floor": [
-      {
-        "mask": -1,
-        "position": "0,0,0"
+        "position": "0,1,0"
       },
-      {
-        "mask": -1,
-        "position": "0,0,-1"
-      },
-      {
-        "mask": -1,
-        "position": "0,0,1"
-      },
-      {
-        "mask": -1,
-        "position": "-1,0,0"
-      },
-      {
-        "mask": -1,
-        "position": "-1,0,-1"
-      },
-      {
-        "mask": -1,
-        "position": "-1,0,1"
-      },
-      {
-        "mask": -1,
-        "position": "1,0,0"
-      },
-      {
-        "mask": -1,
-        "position": "1,0,-1"
-      },
-      {
-        "mask": -1,
-        "position": "1,0,1"
-      },
-      {
-        "mask": -1,
-        "position": "0,1,-3"
-      },
-      {
-        "mask": -1,
-        "position": "0,1,-4"
-      },
-      {
-        "mask": -1,
-        "position": "0,1,3"
-      },
-      {
-        "mask": -1,
-        "position": "0,1,4"
-      },
-      {
-        "mask": -1,
-        "position": "-3,1,0"
-      },
-      {
-        "mask": -1,
-        "position": "-4,1,0"
-      },
-      {
-        "mask": -1,
-        "position": "3,1,0"
-      },
-      {
-        "mask": -1,
-        "position": "4,1,0"
-      },
-      {
-        "mask": -1,
-        "position": "2,0,-1"
-      },
-      {
-        "mask": -1,
-        "position": "2,2,4"
-      },
-      {
-        "mask": -1,
-        "position": "0,2,5"
-      },
-      {
-        "mask": -1,
-        "position": "1,2,3"
-      },
-      {
-        "mask": -1,
-        "position": "-1,0,-2"
-      }
     ],
     "Goal": [
       {
-        "isPlayer": false,
-        "position": "-10,-10,-10"
+        "isPlayer": true,
+        "position": "10000,10000,10000"
       }
     ],
-    "Box": [
+    "Floor": [
+      { "position": "-2,0,-2" },
+      { "position": "-2,0,-1" },
+      { "position": "-2,0,0" },
+      { "position": "-2,0,1" },
+      { "position": "-2,0,2" },
+      { "position": "-1,0,-2" },
+      { "position": "-1,0,-1" },
+      { "position": "-1,0,0" },
+      { "position": "-1,0,1" },
+      { "position": "-1,0,2" },
+      { "position": "0,0,-2" },
+      { "position": "0,0,-1" },
+      { "position": "0,0,0" },
+      { "position": "0,0,1" },
+      { "position": "0,0,2" },
+      { "position": "1,0,-2" },
+      { "position": "1,0,-1" },
+      { "position": "1,0,0" },
+      { "position": "1,0,1" },
+      { "position": "1,0,2" },
+      { "position": "2,0,-2" },
+      { "position": "2,0,-1" },
+      { "position": "2,0,0" },
+      { "position": "2,0,1" },
+      { "position": "2,0,2" },
+      
+      // 2-1
+      { "position": "3,0,0" },
+      
+      /*
+      // 2-2
+      { "position": "0,0,3" },
+      
+      // 2-3
+      { "position": "-3,0,0" },
+      
+      // 2-4
+      { "position": "0,0,-3" },
+      */
+    ],
+    "Effect": [
+      // 2-1
       {
-        "mask": -1,
-        "position": "0,1,-1"
+        "script": "ShowInfo",
+        "position": "2,1,0",
+        "args": {
+          "msg": "Level 2-1",
+          "pos": "3,1,0",
+          "offset": "45"
+        }
       },
       {
-        "mask": -1,
-        "position": "1,1,-1"
+        "script": "SelectLevel",
+        "position": "3,1,0",
+        "args": { "name": "2-1" }
+      },
+      
+      /*
+      // 2-2
+      {
+        "script": "ShowInfo",
+        "position": "0,1,2",
+        "args": {
+          "msg": "Level 2-2",
+          "pos": "0,1,3",
+          "offset": "45"
+        }
       },
       {
-        "mask": -1,
-        "position": "3,2,0"
-      }
-    ]
+        "script": "SelectLevel",
+        "position": "0,1,3",
+        "args": { "name": "2-2" }
+      },
+      
+      // 2-3
+      {
+        "script": "ShowInfo",
+        "position": "-2,1,0",
+        "args": {
+          "msg": "Level 2-3",
+          "pos": "-3,1,0",
+          "offset": "45"
+        }
+      },
+      {
+        "script": "SelectLevel",
+        "position": "-3,1,0",
+        "args": { "name": "2-3" }
+      },
+      
+      // 2-4
+      {
+        "script": "ShowInfo",
+        "position": "0,1,-2",
+        "args": {
+          "msg": "Level 2-4",
+          "pos": "0,1,-3",
+          "offset": "45"
+        }
+      },
+      {
+        "script": "SelectLevel",
+        "position": "0,1,-3",
+        "args": { "name": "2-4" }
+      },
+      */
+    ],
   },
   "Views": {
-    "Default": {
-      "Face": [
-        0
-      ]
-    },
-    "Vertex": [
-      0,
-      1,
-      2,
-      3
-    ],
-    "Edge": [
-      0,
-      1,
-      2,
-      3
-    ],
-    "Face": [
-      0,
-      1,
-      2,
-      3
-    ]
+    "Default": { "Face": [ 0 ] },
+    "Vertex": [ 0, 1, 2, 3 ],
+    "Edge": [ 0, 1, 2, 3 ],
+    "Face": [ 0, 1, 2, 3 ]
   }
 }

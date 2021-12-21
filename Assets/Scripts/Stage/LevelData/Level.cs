@@ -26,7 +26,6 @@ namespace Stage.LevelData {
 
                 // Trigger
                 "Goal" => Deserialize<Goal>(json),
-                "LevelSelector" => Deserialize<LevelSelector>(json),
                 "Effect" => Deserialize<Effect>(json),
 
                 // Other types

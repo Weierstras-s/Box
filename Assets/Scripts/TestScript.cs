@@ -18,9 +18,18 @@ namespace Stage {
             Add(new Goal() { position = new(100000, 100000, 100000) });
             Add(new Player() { position = new(0, 1, 0) });
 
-            for(int i = -2; i <= 2; ++i) {
-                for(int j = -2; j <= 2; ++j) {
-            Add(new Floor() { position = new(i, 0, j) });
+            Add(new Floor() { position = new(-3, 0, 0) });
+            Add(new Floor() { position = new(-4, 0, 0) });
+            Add(new Effect() {
+                position = new(-4, 1, 0),
+                script = "SwitchScene",
+                args = new() {
+                    { "name", "Editor" }
+                }
+            });
+            for (int i = -2; i <= 2; ++i) {
+                for (int j = -2; j <= 2; ++j) {
+                    Add(new Floor() { position = new(i, 0, j) });
                 }
             }
             for(int i = 3; i <= 30; ++i) {
@@ -30,7 +39,13 @@ namespace Stage {
             for(int i = 1; i <= 5; ++i) {
                 int x = 3 * i + 2;
                 Add(new Box() { position = new(x, 1, 1) });
-                Add(new LevelSelector() { position = new(x, 1, 2), name = i.ToString() });
+                Add(new Effect() {
+                    position = new(x, 1, 2),
+                    script = "SelectLevel",
+                    args = new() {
+                        { "name", $"{i}" },
+                    }
+                });
                 Add(new Floor() { position = new(x, 0, 1) });
                 Add(new Floor() { position = new(x, 0, 2) });
                 Add(new Effect() {

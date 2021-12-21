@@ -13,7 +13,7 @@ namespace Stage.LevelData {
         }
 
         public static Level MainLevel() {
-            return Level.FromJson(TestScript.Level2(), "main");
+            //return Level.FromJson(TestScript.Level2(), "main");
             return LoadFromFile("main");
         }
         public static Level NextLevel(Level current) {
