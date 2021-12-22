@@ -6,7 +6,9 @@ using static Utils.Common;
 
 namespace Stage.Effects {
     public class ShowInfo : BaseEffect {
-        private GameObject infoPrefab;
+        private GameObject infoPrefab {
+            get => Resources.Load<GameObject>("UI/Info");
+        }
         private UI.InfoController info;
 
         public override void OnEnter(Item enter, Dictionary<string, string> args) {
@@ -20,9 +22,6 @@ namespace Stage.Effects {
         public override void OnExit(Item exit, Dictionary<string, string> args) {
             if (info == null) return;
             info.Remove();
-        }
-        private void Start() {
-            infoPrefab = Resources.Load<GameObject>("UI/Info");
         }
     }
 }
